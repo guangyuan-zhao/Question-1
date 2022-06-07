@@ -1,0 +1,230 @@
+﻿<h1 id="question-1"><strong>Question 1</strong></h1>
+<h2 id="create-q1-directory-for-this-question">Create “Q1” directory for this question:</h2>
+<ol>
+<li><p>Investigate the nested directories situation</p>
+</li>
+<li><p>Investigate the parallel directories situation</p>
+</li>
+<li><p>Investigate the parallel files situation</p>
+</li>
+<li><p>Investigate situation with different document types</p>
+</li>
+<li><p>Answer questions posted and summary of this question</p>
+</li>
+</ol>
+<hr />
+<h3 id="nested-directories"><em>Nested Directories</em></h3>
+<pre><code class="language-markdown">gstat ./Q1/
+</code></pre>
+<p><img src="Screenshots/1.jpg" alt="" />
+For one empty directory: the size is 64 kilobit (8KB) and the Links is 2.</p>
+<h4 id="create-another-open-directory-named-1-under-q1">Create another open directory named “1” under Q1</h4>
+<pre><code class="language-markdown">ls -R ./Q1/
+gstat ./Q1/
+</code></pre>
+<p><img src="Screenshots/2.jpg" alt="" />
+Size of “Q1” directory increases from 64 kilobit to 96 kilobit (an increase of 32 kilobit) and Links increases from 2 to 3 (an increase of 1).</p>
+<h4 id="increase-the-length-of-the-name-of-the-nested-directory-to-1234567890">Increase the length of the name of the nested directory to “1234567890”:</h4>
+<pre><code class="language-markdown">ls -R ./Q1/
+gstat ./Q1/
+</code></pre>
+<p><img src="Screenshots/3.jpg" alt="" />
+Size of the parent directory does not change nor does the Links.</p>
+<h4 id="add-more-layers-of-nested-directory">Add more layers of nested directory</h4>
+<pre><code class="language-markdown">ls -R ./Q1/
+gstat ./Q1/
+</code></pre>
+<p><img src="Screenshots/4.jpg" alt="" />
+<img src="Screenshots/5.jpg" alt="" />
+<img src="Screenshots/6.jpg" alt="" />
+<img src="Screenshots/7.jpg" alt="" />
+Size of “Q1” directory increases from 96 kilobit to 128 kilobit (an increase of 32 kilobit) and Links increases from 3 to 4 (an increase of 1). But the size and Links remain the same from Layer 2.</p>
+<h4 id="delete-layers-of-nested-directory-one-by-one">Delete layers of nested directory one by one</h4>
+<pre><code class="language-markdown">ls -R ./Q1/
+gstat ./Q1/
+</code></pre>
+<p><img src="Screenshots/8.jpg" alt="" />
+<img src="Screenshots/9.jpg" alt="" />
+<img src="Screenshots/10.jpg" alt="" />
+<img src="Screenshots/11.jpg" alt="" />
+<img src="Screenshots/12.jpg" alt="" />
+Size and Links of the directory does not change until all nested directories are deleted. However, &quot;Q1&quot; directory is now 32 kilobit larger than it was initially created (64 kilobit) and has 1 more Links. I take a look at all the hidden files in the directory and compare it to a newly created directory called “Q2”.</p>
+<pre><code class="language-markdown">ls -a ./Q1/
+ls -a ./Q2/
+gstat ./Q2/
+gstat ./Q1/.DS_Store
+</code></pre>
+<p><img src="Screenshots/13.jpg" alt="" />
+<img src="Screenshots/14.jpg" alt="" />
+This “.DS_Store” file might be the reason behind this. I delete the “.DS_Store” and now size and Links of directory “Q1” become 64 kilobit and 2.<br />
+<strong>Throughout this experiment, the inode number of directory “Q1” remains as 12957178474.</strong></p>
+<hr />
+<h3 id="parallel-directories"><em>Parallel Directories</em></h3>
+<h4 id="start-over-with-a-new-q1-directory">Start over with a new “Q1” directory</h4>
+<h4 id="double-check-gstat-of-q1-and-q1-containing-empty-directory-1">Double check gstat of “Q1” and “Q1” containing empty directory “1”</h4>
+<pre><code class="language-markdown">gstat ./Q1/
+</code></pre>
+<p><img src="Screenshots/15.jpg" alt="" /></p>
+<pre><code class="language-markdown">ls -R ./Q1/
+gstat ./Q1/
+</code></pre>
+<p><img src="Screenshots/16.jpg" alt="" />
+Note that the inode of this “Q1” directory is different from the previous “Q1” directory.</p>
+<h4 id="add-one-more-directory-next-to-1">Add one more directory next to “1”</h4>
+<pre><code class="language-markdown">ls -R ./Q1/
+gstat ./Q1/
+</code></pre>
+<p><img src="Screenshots/17.jpg" alt="" />
+Size of “Q1” directory increases from 96 kilobit to 160 kilobit (an increase of <strong>64 kilobit</strong> for second directory) and Links increases from 3 to 5 (an increase of <strong>2</strong>). Remember that when I add first subdirectory, increase in size is 32 kilobit and increase in Links is 1.<br />
+Examine a bit more.</p>
+<h4 id="add-more-directories-next-to-1-and-2">Add more directories next to “1” and &quot;2&quot;</h4>
+<pre><code class="language-markdown">ls -R ./Q1/
+gstat ./Q1/
+</code></pre>
+<p><img src="Screenshots/18.jpg" alt="" />
+<img src="Screenshots/19.jpg" alt="" />
+<img src="Screenshots/20.jpg" alt="" />
+<img src="Screenshots/21.jpg" alt="" />
+Size of “Q1” directory increases from 160 kilobit to 288 kilobit (an increase of 32 kilobit for every directory added) and Links increases from 5 to 9 (an increase of 1 for every directory added).<br />
+In this trend, when there are 10 subdirectories in “Q1”, it follows a piecewise function:
+N = 0, size = 64, Links = 2<br />
+N = 1, size = 96, Links = 3<br />
+N = 2, size = 160, Links = 5<br />
+N &gt;= 3, size = 160 + 32*(N-2), Links = 5+1*(N-2)<br />
+For N = 10, size = 160 + 32*(10-2) = 416, Links = 5+1*(10-2) = 13</p>
+<pre><code class="language-markdown">ls -R ./Q1/
+gstat ./Q1/
+</code></pre>
+<p><img src="Screenshots/22.jpg" alt="" /></p>
+<h4 id="verify-this-finding-using-another-method">Verify this finding using another method</h4>
+<pre><code class="language-markdown">mkdir Q2
+cd Q2/
+mkdir {1..10}
+cd ../
+gstat ./Q2/
+</code></pre>
+<p><img src="Screenshots/23.jpg" alt="" />
+Looks like there is discrepancy between the two methods. Could it be the “.DS_Store” file again?</p>
+<pre><code class="language-markdown">ls -a ./Q1/
+ls -a ./Q2/
+gstat ./Q1/.DS_Store
+</code></pre>
+<p><img src="Screenshots/24.jpg" alt="" />
+Delete this file and check again
+<img src="Screenshots/25.jpg" alt="" />
+Now Q1 and Q2 are the same in size and Links.</p>
+<h4 id="delete-directories-one-by-one">Delete directories one by one</h4>
+<pre><code class="language-markdown">ls -R ./Q1/
+gstat ./Q1/
+</code></pre>
+<p><img src="Screenshots/26.jpg" alt="" />
+No change in size and Links after removing one directory.
+<img src="Screenshots/27.jpg" alt="" />
+<img src="Screenshots/28.jpg" alt="" />
+<img src="Screenshots/29.jpg" alt="" />
+<img src="Screenshots/30.jpg" alt="" />
+<img src="Screenshots/31.jpg" alt="" />
+<img src="Screenshots/32.jpg" alt="" />
+<img src="Screenshots/33.jpg" alt="" />
+<img src="Screenshots/34.jpg" alt="" />
+<img src="Screenshots/35.jpg" alt="" />
+Size of “Q1” directory decreases from 384 kilobit to 96 kilobit (an decrease of <strong>32 kilobit</strong> for every directory deleted) and Links decreases from 12 to 3 (an decrease of <strong>1</strong> for every directory deleted). It is still 32 kilobit larger than a freshly created directory.</p>
+<pre><code class="language-markdown">ls -a ./Q1/
+gstat ./Q1/.DS_Store
+</code></pre>
+<p><img src="Screenshots/36.jpg" alt="" />
+File “.DS_Store” comes back again as a hidden file.</p>
+<hr />
+<h3 id="parallel-files"><em>Parallel Files</em></h3>
+<h4 id="start-over-with-a-new-q1-directory-1">Start over with a new “Q1” directory</h4>
+<h4 id="double-check-gstat-of-q1">Double check gstat of “Q1”</h4>
+<pre><code class="language-markdown">gstat ./Q1/
+</code></pre>
+<p><img src="Screenshots/37.jpg" alt="" /></p>
+<h4 id="create-a-word-document">Create a word document</h4>
+<pre><code class="language-markdown">gstat ./Q1/
+gstat ./Q1/1.docx
+</code></pre>
+<p><img src="Screenshots/38.jpg" alt="" />
+<img src="Screenshots/39.jpg" alt="" />
+Size of “Q1” directory increases from 64 kilobit to 96 kilobit (an increase of 32 kilobit for first word document) and Links increases from 2 to 3 (an increase of 1).<br />
+Size of empty 1.docx is 12361 and Links is 1.</p>
+<h4 id="add-text-content-in-word-document">Add text content in word document?</h4>
+<pre><code class="language-markdown">gstat ./Q1/
+gstat ./Q1/1.docx
+</code></pre>
+<p><img src="Screenshots/40.jpg" alt="" />
+No change in size or Links of Q1 directory. There is increase in size of 1.docx but no change in Links of 1.docx.</p>
+<h4 id="add-more-word-documents-to-q1-directory">Add more word documents to Q1 directory</h4>
+<pre><code class="language-markdown">ls -R ./Q1/
+gstat ./Q1/
+</code></pre>
+<p><img src="Screenshots/41.jpg" alt="" />
+<img src="Screenshots/42.jpg" alt="" />
+<img src="Screenshots/43.jpg" alt="" />
+<img src="Screenshots/44.jpg" alt="" />
+Size of “Q1” directory increases from 96 kilobit to 224 kilobit (an increase of <strong>32 kilobit</strong> for every word document added) and Links increases from 3 to 7 (an increase of <strong>1</strong> for every word document added).</p>
+<h4 id="delete-word-documents-one-by-one">Delete word documents one by one</h4>
+<pre><code class="language-markdown">ls -R ./Q1/
+gstat ./Q1/
+</code></pre>
+<p><img src="Screenshots/45.jpg" alt="" />
+No changes after I delete one word document.
+<img src="Screenshots/46.jpg" alt="" />
+<img src="Screenshots/47.jpg" alt="" />
+<img src="Screenshots/48.jpg" alt="" />
+<img src="Screenshots/49.jpg" alt="" />
+Size of “Q1” directory decreases from 224 kilobit to 96 kilobit (an decrease of <strong>32 kilobit</strong> for every directory deleted) and Links decreases from 7 to 3 (an decrease of <strong>1</strong> for every directory deleted). It is still 32 kilobit larger than a freshly created directory.<br />
+Empty directory size is 96 kilobit and Links is 3 after deleting all word documents. The discrepancy between this and the initial created directory is probably due to “.DS_Store” file.
+<img src="Screenshots/50.jpg" alt="" />
+Once “.DS_Store” file is deleted, the size and Links of the empty directory agrees with the original one.</p>
+<hr />
+<h3 id="different-document-types"><em>Different Document Types</em></h3>
+<h4 id="start-over-with-a-new-q1-directory-2">Start over with a new “Q1” directory</h4>
+<h4 id="double-check-gstat-of-q1-1">Double check gstat of “Q1”</h4>
+<pre><code class="language-markdown">gstat ./Q1/
+</code></pre>
+<p><img src="Screenshots/51.jpg" alt="" /></p>
+<h4 id="add-one-word-document-1docx">Add one word document “1.docx”.</h4>
+<pre><code class="language-markdown">ls -R ./Q1/
+gstat ./Q1/
+</code></pre>
+<p><img src="Screenshots/52.jpg" alt="" /></p>
+<h4 id="add-one-excel-spreadsheet-1xlsx">Add one excel spreadsheet “1.xlsx”.</h4>
+<pre><code class="language-markdown">ls -R ./Q1/
+gstat ./Q1/
+</code></pre>
+<p><img src="Screenshots/53.jpg" alt="" /></p>
+<h4 id="add-one-powerpoint-slides-1pptx">Add one powerpoint slides “1.pptx”.</h4>
+<pre><code class="language-markdown">ls -R ./Q1/
+gstat ./Q1/
+</code></pre>
+<p><img src="Screenshots/54.jpg" alt="" />
+Size of “Q1” directory increases by <strong>32 kilobit</strong> and the Links of “Q1” directory increases by <strong>1</strong> for every empty file created.</p>
+<hr />
+<h3 id="posted-questions--summary"><em>Posted Questions &amp; Summary</em></h3>
+<p>Can you explain how “Links” increments and decrements for directories and files?<br />
+For nested directories situation, Links increase or decrease by 1 for every directory created or deleted. Total number of Links = 3 (for one subdirectory) or 4 (for more than one subdirectory)
+For parallel directories situation, Links increase or decrease by 1 for every directory created or deleted. Total number of Links = Total number of directories + 2<br />
+For parallel files situation, Links increase or decrease by 1 for every directory created or deleted. Total number of Links = Total number of directories + 2<br />
+One &quot;confounding&quot; factor in calculating or outputting the Links in directories/subdirectories is the &quot;.DS_Store&quot; file particular to macOS.</p>
+<p>What command can you use to target a file via inode number?</p>
+<pre><code class="language-markdown">gstat ./Q1/1.docx
+stat ./Q1/1.docx
+GetFileInfo /.vol/16777220/12957196632
+</code></pre>
+<p><img src="Screenshots/55.jpg" alt="" />
+Use macOS's stat can retrieve device (first string of numbers after &quot;/.vol/&quot;) and inode number (hard link, second string of numbers after &quot;/.vol/&quot;). Use &quot;GetFileInfo&quot; function to show the path of the file of interest.</p>
+<p>What are the Links in an empty directory?</p>
+<pre><code class="language-markdown">ls -al ./Q1/
+</code></pre>
+<p><img src="Screenshots/56.jpg" alt="" />
+For empty directory, it &quot;inherently&quot; has two hard links when it is created. One is &quot;.&quot; linking to the directory itself and the other one is &quot;..&quot; linking to the parent directory of the directory created.</p>
+<p>How do stat links relate to the ln function?<br />
+Stat links are hard links that essential associated with a unique inode number. The original file path could be retrieved via “GetFileInfo” function.</p>
+<p>While investigating this system, what were the most useful/informative commands?</p>
+<ul>
+<li>ls -R: the -R option of &quot;ls&quot; function list all the files, subdirectories under a specified directory so that I can see the tree/hierarchy of the structure of the directory</li>
+<li>ls -a: the -a option of &quot;ls&quot; function list all hidden files so that I can see what is also occupying the space</li>
+<li>gstat: this function gives more information than &quot;stat&quot; of macOS regarding the permission group, date and time created and modified.</li>
+</ul>
